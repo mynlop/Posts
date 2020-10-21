@@ -7,6 +7,9 @@ verify_ssl = true
 
 [packages]
 flask = "*"
+flask-mysql = "*"
+flask-wtf = "*"
+passlib = "*"
 
 [requires]
 python_version = "3.7"
