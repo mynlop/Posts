@@ -1,5 +1,5 @@
 from flask import Flask, render_template, flash, redirect, url_for, session, request, logging
-from data import Articles
+# from data import Articles
 from flaskext.mysql import MySQL
 from wtforms import Form, StringField, TextAreaField, PasswordField, validators
 from passlib.hash import sha256_crypt
@@ -17,7 +17,7 @@ mysql = MySQL()
 mysql.init_app(app)
 
 
-Articles = Articles()
+# Articles = Articles()
 
 @app.route('/')
 def index():
@@ -29,11 +29,28 @@ def about():
 
 @app.route('/articles')
 def articles():
-    return render_template('articles.html', articles=Articles)
+    con = mysql.connect()
+    cur = con.cursor()
+
+    result = cur.execute("SELECT * FROM articles")
+    articles = cur.fetchall()
+
+    if result > 0:
+        return render_template('articles.html', articles=articles)
+    else:
+        msg = "No articles found"
+        return render_template('articles.html', msg=msg)
+
+    cur.close()   
 
 @app.route('/article/<string:id>')
 def article(id):
-    return render_template('article.html', id=id)
+    con = mysql.connect()
+    cur = con.cursor()
+
+    result = cur.execute("SELECT * FROM articles WHERE id = %s", [id])
+    article = cur.fetchone()
+    return render_template('article.html', article=article)
 
 class RegisterForm(Form):
     name = StringField('Name', [validators.Length(min=1, max=50)])
